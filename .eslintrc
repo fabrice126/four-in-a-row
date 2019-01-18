@@ -1,0 +1,42 @@
+{
+    "extends": [
+        "airbnb",
+        "plugin:jsx-a11y/recommended"
+    ],
+    "env": {
+        "node": true,
+        "es6": true,
+        "browser": true,
+        "commonjs": true
+    },
+    "parser": "babel-eslint",
+    "rules": {
+        "key-spacing": [
+            "error",
+            {
+                "multiLine": {
+                    "beforeColon": true,
+                    "afterColon": true
+                },
+                "align": {
+                    "beforeColon": true,
+                    "afterColon": true,
+                    "on": "colon"
+                }
+            }
+        ],
+        "react/jsx-indent": [true, "tab"],
+        "indent": ["error", "tab"],
+        "react/destructuring-assignment": "off",
+        "react/jsx-one-expression-per-line": "off",
+        "react/jsx-filename-extension": "off",
+        "jsx-a11y/click-events-have-key-events": "off",
+        "jsx-a11y/mouse-events-have-key-events": "off",
+        "jsx-a11y/no-noninteractive-element-interactions": "off",
+        "class-methods-use-this": "off",
+        "no-tabs": "off",
+        "max-len": "off",
+        "no-console": "off",
+        "no-plusplus": "off"
+    }
+}
