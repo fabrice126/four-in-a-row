@@ -84,14 +84,15 @@ class App extends React.Component {
 	checkForWinner(line, column, grid, currentPlayer) {
 		const checkLine = this.checkForLine(line, grid, currentPlayer);
 		const checkColumn = this.checkForColumn(column, grid, currentPlayer);
-		if (checkLine || checkColumn) {
+		const checkDiagonal = this.checkForDiagonal(line, column, grid, currentPlayer);
+		if (checkLine || checkColumn || checkDiagonal) {
 			return currentPlayer;
 		}
 		return null;
 	}
 
 	/**
-	 *
+	 * Permet de vérifier si la ligne sur lequel le jeton a été placé comporte un gagnant
 	 * @param {number} line correspond a la ligne du jeton
 	 * @param {object} grid grille du jeu
 	 * @param {string} currentPlayer X ou O en fonction du joueur
@@ -103,7 +104,7 @@ class App extends React.Component {
 	}
 
 	/**
-	 *
+	 * Permet de vérifier si la colonne sur lequel le jeton a été placé comporte un gagnant
 	 * @param {number} column correspond a la colonne du jeton
 	 * @param {object} grid grille du jeu
 	 * @param {string} currentPlayer X ou O en fonction du joueur
@@ -113,6 +114,85 @@ class App extends React.Component {
 		const tCurrentColumn = [];
 		Object.keys(grid).forEach(line => tCurrentColumn.push(grid[line][column]));
 		return this.hasWon(tCurrentColumn, currentPlayer);
+	}
+
+	/**
+	 * Permet de vérifier si les diagonales sur lequel le jeton a été placé comporte un gagnant
+	 * @param {number} line correspond a la ligne du jeton
+	 * @param {number} column correspond a la colonne du jeton
+	 * @param {object} grid grille du jeu
+	 * @param {string} currentPlayer X ou O en fonction du joueur
+	 * @returns {boolean} si le joueur a gagné ou non
+	 */
+	checkForDiagonal(line, column, grid, currentPlayer) {
+		const checkLeftToRight = this.checkForDiagonalLeftToRight(line, column, grid, currentPlayer);
+		const checkRightToLeft = this.checkForDiagonalRightToLeft(line, column, grid, currentPlayer);
+		if (checkLeftToRight || checkRightToLeft) {
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Permet de vérifier si la diagonale partant du bas gauche et allant en haut a droite comporte un gagnant
+	 * @param {number} line correspond a la ligne du jeton
+	 * @param {number} column correspond a la colonne du jeton
+	 * @param {object} grid grille du jeu
+	 * @param {string} currentPlayer X ou O en fonction du joueur
+	 * @returns {boolean} si le joueur a gagné ou non
+	 */
+	checkForDiagonalLeftToRight(line, column, grid, currentPlayer) {
+		const tDiagonal = [];
+		let tmpLine = line;
+		let tmpColumn = column;
+		let hasWon = false;
+		// On récupére la ligne et la colonne du debut de la diagonale
+		while (tmpLine > 0 && tmpColumn > 0) {
+			tmpLine--;
+			tmpColumn--;
+		}
+		// On itére sur le cellule de la diagonale et on ajoute au tDiagonal les jetons
+		while (tmpLine < this.nbRow && tmpColumn < this.nbColumn) {
+			const { [tmpLine]: currentLine } = grid;
+			tDiagonal.push(currentLine[tmpColumn]);
+			tmpLine++;
+			tmpColumn++;
+		}
+		if (tDiagonal.length > 3) {
+			hasWon = this.hasWon(tDiagonal, currentPlayer);
+		}
+		return hasWon;
+	}
+
+	/**
+	 * Permet de vérifier si la diagonale partant du bas droite et allant en haut a gauche comporte un gagnant
+	 * @param {number} line correspond a la ligne du jeton
+	 * @param {number} column correspond a la colonne du jeton
+	 * @param {object} grid grille du jeu
+	 * @param {string} currentPlayer X ou O en fonction du joueur
+	 * @returns {boolean} si le joueur a gagné ou non
+	 */
+	checkForDiagonalRightToLeft(line, column, grid, currentPlayer) {
+		const tDiagonal = [];
+		let tmpLine = line;
+		let tmpColumn = column;
+		let hasWon = false;
+		// On récupére la ligne et la colonne du debut de la diagonale
+		while (tmpLine > 0 && tmpColumn < this.nbColumn - 1) {
+			tmpLine--;
+			tmpColumn++;
+		}
+		while (tmpLine < this.nbRow && tmpColumn >= 0) {
+			const { [tmpLine]: currentLine } = grid;
+			tDiagonal.push(currentLine[tmpColumn]);
+			tmpLine++;
+			tmpColumn--;
+		}
+		// On itére sur le cellule de la diagonale et on ajoute au tDiagonal les jetons
+		if (tDiagonal.length > 3) {
+			hasWon = this.hasWon(tDiagonal, currentPlayer);
+		}
+		return hasWon;
 	}
 
 	/**
