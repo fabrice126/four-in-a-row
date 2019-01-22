@@ -10,7 +10,6 @@ class App extends React.Component {
 		this.widthCell = 80;
 		this.currentElt = null;
 		const initState = {};
-		this.currentPlayer = 'X';
 		for (let i = 0; i < this.nbRow; i++) {
 			initState[i] = Array(this.nbColumn).fill('_');
 		}
@@ -265,7 +264,7 @@ class App extends React.Component {
 	}
 
 	render() {
-		const { hasWon } = this.state;
+		const { hasWon, currentPlayer } = this.state;
 		return (
 			<div className="App">
 				<header className="App-header">
@@ -287,7 +286,7 @@ class App extends React.Component {
 					{
 						hasWon
 							? <h1>Le joueur {hasWon === 'X' ? 'jaune' : 'rouge'} a gagné</h1>
-							: <h1>Aucun gagant</h1>
+							: <h1>C'est au joueur {currentPlayer === 'X' ? 'jaune' : 'rouge'}</h1>
 					}
 				</header>
 			</div>
