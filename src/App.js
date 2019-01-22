@@ -25,12 +25,13 @@ class App extends React.Component {
 	onHover(e) {
 		const { currentPlayer } = this.state;
 		if (this.currentElt !== null) {
+			if (this.currentElt.style.transform !== '') return;
 			this.currentElt.classList.remove(currentPlayer);
 		}
 		const name = e.target.getAttribute('name');
 		if (!name) return;
 		const columnOver = name.split('-')[1];
-		this.currentElt = document.querySelector(`#rowChoice th:nth-child(${Number(columnOver) + 1}) div`);
+		this.currentElt = document.getElementById(`${columnOver}_rowChoice`);
 		this.currentElt.classList.add(currentPlayer);
 	}
 
@@ -51,10 +52,16 @@ class App extends React.Component {
 		}
 		// Si toute les cellule de la colonne "j" sont remplie alors i === this.nbRow. Impossible d'ajouter de jeton
 		if (i === this.nbRow) return;
+		const eltCell = document.getElementById(`${i}-${j}`);
+		const eltToken = document.getElementById(`${j}_rowChoice`);
+		const { y: yToken } = eltToken.getBoundingClientRect();
+		const { y: yCell } = eltCell.getBoundingClientRect();
+		// Ajout de la l'effet de chute du jeton
+		eltToken.style.setProperty('transform', `translateY(${yCell - yToken}px)`);
+		eltToken.style.setProperty('transition', '0.5s ease-in');
 		const { [i] : tCurrentLine } = grid;
 		tCurrentLine[j] = currentPlayer;
 		this.nbRound++;
-		this.currentElt.classList.remove(currentPlayer);
 		// A partir du 8ème tour un joueur peut avoir placé assez de jeton pour gagner
 		if (this.nbRound >= 7) {
 			const winner = this.checkForWinner(i, j, grid, currentPlayer);
@@ -63,14 +70,17 @@ class App extends React.Component {
 			}
 		}
 		const newCurrentPlayer = this.changePlayer(currentPlayer);
-		this.setState({
-			grid : {
-				...grid,
-				[i] : tCurrentLine,
-			},
-			currentPlayer : newCurrentPlayer,
-			hasWon,
-		});
+		setTimeout(() => {
+			this.currentElt.classList.remove(currentPlayer);
+			// Suppression de l'effet de chute du jeton
+			eltToken.style.removeProperty('transform');
+			eltToken.style.removeProperty('transition');
+			this.setState({
+				grid          : { ...grid, [i]: tCurrentLine },
+				currentPlayer : newCurrentPlayer,
+				hasWon,
+			});
+		}, 500);
 	}
 
 	/**
@@ -231,8 +241,8 @@ class App extends React.Component {
 				else background = 'backgroundRed';
 			}
 			const cell = (
-				<td key={`${i}-${j}`} name={`${i}-${j}`} onClick={() => this.onAddToken(j)} onMouseOver={this.onHover} style={{ height: this.widthCell, width: this.widthCell }}>
-					<div name={`${i}-${j}`} className={`cell ${background}`} />
+				<td key={`${i}-${j}`} name={`${i}-${j}`} onClick={() => this.onAddToken(j)} onMouseMove={this.onHover} style={{ height: this.widthCell, width: this.widthCell }}>
+					<div name={`${i}-${j}`} id={`${i}-${j}`} className={`cell ${background}`} />
 				</td>
 			);
 			tCells.push(cell);
@@ -258,18 +268,17 @@ class App extends React.Component {
 		return (
 			<div className="App">
 				<header className="App-header">
+					<div className="XAnime" />
+					<div id="rowChoice">
+						{
+							[...Array(this.nbColumn)].map((elt, j) => (
+								<div key={`${j}_rowChoice`} className="no-border flex-justify-center" style={{ height: this.widthCell, width: this.widthCell }}>
+									<div id={`${j}_rowChoice`} />
+								</div>
+							))
+						}
+					</div>
 					<table>
-						<thead>
-							<tr id="rowChoice">
-								<th className="no-border" style={{ height: this.widthCell, width: this.widthCell }}><div /></th>
-								<th className="no-border" style={{ height: this.widthCell, width: this.widthCell }}><div /></th>
-								<th className="no-border" style={{ height: this.widthCell, width: this.widthCell }}><div /></th>
-								<th className="no-border" style={{ height: this.widthCell, width: this.widthCell }}><div /></th>
-								<th className="no-border" style={{ height: this.widthCell, width: this.widthCell }}><div /></th>
-								<th className="no-border" style={{ height: this.widthCell, width: this.widthCell }}><div /></th>
-								<th className="no-border" style={{ height: this.widthCell, width: this.widthCell }}><div /></th>
-							</tr>
-						</thead>
 						<tbody>
 							{this.createRow()}
 						</tbody>
