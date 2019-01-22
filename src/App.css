@@ -4,6 +4,12 @@
   box-sizing: border-box;
 }
 
+:root {
+  --color-player-x: yellow;
+  --color-player-o: red;
+  --box-shadow-token: inset 3px 3px 40px 0px rgba(59, 94, 94, 0.8)
+}
+
 .App {
   text-align: center;
 }
@@ -70,36 +76,31 @@ tr td {
 }
 
 #rowChoice div.X {
-  background-color: yellow;
+  background-color: var(--color-player-x);
   border-radius: 100%;
   width: 95%;
   height: 95%;
   z-index: 1;
-  background-color: yellow;
-  box-shadow: inset 5px 5px 40px 0px rgba(59, 94, 94, 0.8);
+  background-color: var(--color-player-x);
+  box-shadow: var(--box-shadow-token);
 }
 
 #rowChoice div.O {
-  background-color: red;
+  background-color: var(--color-player-o);
   border-radius: 100%;
   width: 95%;
   height: 95%;
   z-index: 1;
-  background-color: red;
-  box-shadow: inset 5px 5px 40px 0px rgba(59, 94, 94, 0.8);
+  background-color: var(--color-player-o);
+  box-shadow: var(--box-shadow-token);
 }
 
 .backgroundRed {
   background-color: red;
-  box-shadow: inset 5px 5px 40px 0px rgba(59, 94, 94, 0.8);
+  box-shadow: var(--box-shadow-token);
 }
 
 .backgroundYellow {
   background-color: yellow;
-  box-shadow: inset 5px 5px 40px 0px rgba(59, 94, 94, 0.8);
-}
-
-.translateY {
-  transition: 1.5s;
-  transform: translateY(50px)
+  box-shadow: var(--box-shadow-token);
 }

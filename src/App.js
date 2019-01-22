@@ -7,7 +7,7 @@ class App extends React.Component {
 		this.nbRow = 6;
 		this.nbColumn = 7;
 		this.nbRound = 0;
-		this.widthCell = 60;
+		this.widthCell = 80;
 		this.currentElt = null;
 		const initState = {};
 		this.currentPlayer = 'X';
@@ -42,7 +42,8 @@ class App extends React.Component {
 	onAddToken(j) {
 		const { grid, currentPlayer } = this.state;
 		let { hasWon } = this.state;
-		if (hasWon) return;
+		// Si il y a un gagnant ou que le joueur est entrain de joué l'animation
+		if (hasWon || this.currentElt.style.transform !== '') return;
 		let i;
 		// pour chaque ligne "i" on cherche la premiére cellule de la la colonne "j" qui n'est pas remplie
 		for (i = 0; i < this.nbRow; i++) {
