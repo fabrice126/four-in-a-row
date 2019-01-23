@@ -60,7 +60,10 @@ class App extends React.Component {
 			if (line[j] === '_') break;
 		}
 		// Si toute les cellule de la colonne "j" sont remplie alors i === this.nbRow. Impossible d'ajouter de jeton
-		if (i === this.nbRow) return;
+		if (i === this.nbRow) {
+			this.roundOnGoing = false;
+			return;
+		}
 		const eltCell = document.getElementById(`${i}-${j}`);
 		const eltToken = document.getElementById(`${j}_rowChoice`);
 		const { y: yToken } = eltToken.getBoundingClientRect();
