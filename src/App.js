@@ -8,7 +8,8 @@ class App extends React.Component {
 		this.nbColumn = 7;
 		this.nbRound = 0;
 		this.widthCell = 80;
-		this.currentElt = null;
+		this.roundOnGoing = false; // Lorsque le joueur a joué mais que le jeton tombe toujours
+		this.currentTokenElt = null; // Le jeton actuellement au dessus de la grille de jeu
 		const initState = {};
 		for (let i = 0; i < this.nbRow; i++) {
 			initState[i] = Array(this.nbColumn).fill('_');
@@ -21,17 +22,18 @@ class App extends React.Component {
 		this.onHover = this.onHover.bind(this);
 	}
 
-	onHover(e) {
+	/**
+	 * Permet d'afficher un jeton au dessus de la grille de jeu
+	 * @param {number} j le numero de la colonne
+	 */
+	onHover(j) {
+		if (this.roundOnGoing) return;
 		const { currentPlayer } = this.state;
-		if (this.currentElt !== null) {
-			if (this.currentElt.style.transform !== '') return;
-			this.currentElt.classList.remove(currentPlayer);
+		if (this.currentTokenElt !== null) {
+			this.currentTokenElt.classList.remove(currentPlayer);
 		}
-		const name = e.target.getAttribute('name');
-		if (!name) return;
-		const columnOver = name.split('-')[1];
-		this.currentElt = document.getElementById(`${columnOver}_rowChoice`);
-		this.currentElt.classList.add(currentPlayer);
+		this.currentTokenElt = document.getElementById(`${j}_rowChoice`);
+		this.currentTokenElt.classList.add(currentPlayer);
 	}
 
 	/**
@@ -39,10 +41,17 @@ class App extends React.Component {
 	 * @param {number} j correspond a la colonne du jeton
 	 */
 	onAddToken(j) {
+		// Le tour du joueur n'est pas fini
+		if (this.roundOnGoing) return;
+		// Si l'utilisateur clique, change de colonne pendant l'animation, ne bouge plus la souris et reclique
+		// l'animation ne s'effectuait pas car le onMouseMouve n'aura pas été déclanché et n'affiché jamais
+		// le jeton au dessus du jeu, appeler onHover permet de rajouter le jeton au clique
+		this.onHover(j);
+		this.roundOnGoing = true;
 		const { grid, currentPlayer } = this.state;
 		let { hasWon } = this.state;
 		// Si il y a un gagnant ou que le joueur est entrain de joué l'animation
-		if (hasWon || this.currentElt.style.transform !== '') return;
+		if (hasWon) return;
 		let i;
 		// pour chaque ligne "i" on cherche la premiére cellule de la la colonne "j" qui n'est pas remplie
 		for (i = 0; i < this.nbRow; i++) {
@@ -71,7 +80,7 @@ class App extends React.Component {
 		}
 		const newCurrentPlayer = this.changePlayer(currentPlayer);
 		setTimeout(() => {
-			this.currentElt.classList.remove(currentPlayer);
+			this.currentTokenElt.classList.remove(currentPlayer);
 			// Suppression de l'effet de chute du jeton
 			eltToken.style.removeProperty('transform');
 			eltToken.style.removeProperty('transition');
@@ -79,6 +88,9 @@ class App extends React.Component {
 				grid          : { ...grid, [i]: tCurrentLine },
 				currentPlayer : newCurrentPlayer,
 				hasWon,
+			}, () => {
+				this.roundOnGoing = false;
+				this.onHover(j);
 			});
 		}, 500);
 	}
@@ -241,7 +253,7 @@ class App extends React.Component {
 				else background = 'backgroundRed';
 			}
 			const cell = (
-				<td key={`${i}-${j}`} name={`${i}-${j}`} onClick={() => this.onAddToken(j)} onMouseMove={this.onHover} style={{ height: this.widthCell, width: this.widthCell }}>
+				<td key={`${i}-${j}`} name={`${i}-${j}`} onClick={() => this.onAddToken(j)} onMouseMove={() => this.onHover(j)} style={{ height: this.widthCell, width: this.widthCell }}>
 					<div name={`${i}-${j}`} id={`${i}-${j}`} className={`cell ${background}`} />
 				</td>
 			);
