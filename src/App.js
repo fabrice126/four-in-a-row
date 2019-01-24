@@ -23,7 +23,7 @@ class App extends React.Component {
 	}
 
 	/**
-	 * Permet d'afficher un jeton au dessus de la grille de jeu
+	 * Permet d'afficher un jeton au dessus de la grille de jeu a la colonne j
 	 * @param {number} j le numero de la colonne
 	 */
 	onHover(j) {
@@ -64,38 +64,58 @@ class App extends React.Component {
 			this.roundOnGoing = false;
 			return;
 		}
-		const eltCell = document.getElementById(`${i}-${j}`);
-		const eltToken = document.getElementById(`${j}_rowChoice`);
-		const { y: yToken } = eltToken.getBoundingClientRect();
-		const { y: yCell } = eltCell.getBoundingClientRect();
-		// Ajout de la l'effet de chute du jeton
-		eltToken.style.setProperty('transform', `translateY(${yCell - yToken}px)`);
-		eltToken.style.setProperty('transition', '0.5s ease-in');
-		const { [i] : tCurrentLine } = grid;
-		tCurrentLine[j] = currentPlayer;
-		this.nbRound++;
-		// A partir du 8ème tour un joueur peut avoir placé assez de jeton pour gagner
-		if (this.nbRound >= 7) {
-			const winner = this.checkForWinner(i, j, grid, currentPlayer);
-			if (winner) {
-				hasWon = winner;
+		const endAddToken = () => {
+			const { [i] : tCurrentLine } = grid;
+			tCurrentLine[j] = currentPlayer;
+			this.nbRound++;
+			// A partir du 8ème tour un joueur peut avoir placé assez de jeton pour gagner
+			if (this.nbRound >= 7) {
+				const winner = this.checkForWinner(i, j, grid, currentPlayer);
+				if (winner) {
+					hasWon = winner;
+				}
 			}
-		}
-		const newCurrentPlayer = this.changePlayer(currentPlayer);
-		setTimeout(() => {
+			const newCurrentPlayer = this.changePlayer(currentPlayer);
 			this.currentTokenElt.classList.remove(currentPlayer);
+			this.currentTokenElt.classList.add(newCurrentPlayer);
 			// Suppression de l'effet de chute du jeton
-			eltToken.style.removeProperty('transform');
-			eltToken.style.removeProperty('transition');
+			this.removeTokenAnimation(currentPlayer);
 			this.setState({
 				grid          : { ...grid, [i]: tCurrentLine },
 				currentPlayer : newCurrentPlayer,
 				hasWon,
 			}, () => {
 				this.roundOnGoing = false;
-				this.onHover(j);
+				this.currentTokenElt.removeEventListener('transitionend', endAddToken);
 			});
-		}, 500);
+		};
+		this.currentTokenElt.addEventListener('transitionend', endAddToken);
+		this.addTokenAnimation(i, j);
+	}
+
+	/**
+	 * Permet d'ajouter une animation de translate en Y pour le this.currentTokenElt
+	 * @param {*} i correspond a la ligne du jeton
+	 * @param {*} j correspond a la colonne du jeton
+	 */
+	addTokenAnimation(i, j) {
+		const eltCell = document.getElementById(`${i}-${j}`);
+		const { y: yToken } = this.currentTokenElt.getBoundingClientRect();
+		const { y: yCell } = eltCell.getBoundingClientRect();
+		// Ajout de la l'effet de chute du jeton
+		this.currentTokenElt.style.setProperty('transform', `translateY(${yCell - yToken}px)`);
+		this.currentTokenElt.style.setProperty('transition', '0.5s ease-in');
+	}
+
+	/**
+	 * Permet d'ajouter une animation de translate en Y pour le this.currentTokenElt
+	 * @param {number} i correspond a la ligne du jeton
+	 * @param {number} j correspond a la colonne du jeton
+	 */
+	removeTokenAnimation() {
+		// Suppression de l'effet de chute du jeton
+		this.currentTokenElt.style.removeProperty('transform');
+		this.currentTokenElt.style.removeProperty('transition');
 	}
 
 	/**
@@ -283,7 +303,6 @@ class App extends React.Component {
 		return (
 			<div className="App">
 				<header className="App-header">
-					<div className="XAnime" />
 					<div id="rowChoice">
 						{
 							[...Array(this.nbColumn)].map((elt, j) => (
