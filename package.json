@@ -2,6 +2,7 @@
   "name": "puissance_4",
   "version": "0.1.0",
   "private": true,
+  "homepage": "./",
   "dependencies": {
     "eslint": "^5.6.0",
     "eslint-config-airbnb": "^17.1.0",
